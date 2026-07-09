@@ -49,7 +49,7 @@ data_test_3_v2 = [{"doy": 189, "temperature": 28.9, "bagnatura": 0, "humidity": 
                   {"doy": 195, "temperature": 29.3, "bagnatura": 0, "humidity": 59, "rain": 0.0}]
 
 
-class DatiMeteoApiTest(APITestCase):
+class DatiMeteoV1ApiTest(APITestCase):
     def test_crea_evento_quando_le_condizioni_sono_vere(self):
         data = {
             "doy": 126,
