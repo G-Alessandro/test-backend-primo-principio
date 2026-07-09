@@ -1,8 +1,5 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-import logging
-
-logger = logging.getLogger(__name__)
 
 # dati con il primo giorno contenente l'evento che verra propagato e incrementato nei giorni successivi
 data_test_1_v2 = [{"doy": 189, "temperature": 28.9, "bagnatura": 0, "humidity": 43, "rain": 0.2,
@@ -59,24 +56,14 @@ class DatiMeteoV1ApiTest(APITestCase):
             "rain": 0.0
 
         }
-        logger.info("=" * 50)
-        logger.info("=== Inizio test: creazione evento ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         self.assertEqual(response.data["doy"], 126)
         self.assertEqual(len(response.data["events"]), 1)
         self.assertEqual(response.data["events"][0]["index"], 0)
         self.assertEqual(response.data["events"][0]["X"], 0.0)
-
-        logger.info("Fine test")
 
     def test_nessun_evento_creato_quando_le_condizioni_sono_false(self):
         data = {
@@ -87,22 +74,11 @@ class DatiMeteoV1ApiTest(APITestCase):
             "rain": 0.0
         }
 
-        logger.info("=" * 50)
-        logger.info(
-            "=== Inizio test: evento non creato con condizioni false ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
-
         response = self.client.post("/dati-meteo/v1/", data, format="json")
-
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["events"], [])
 
-        logger.info("Fine test")
 
     def test_x_non_diminuisce(self):
         data = {
@@ -115,22 +91,12 @@ class DatiMeteoV1ApiTest(APITestCase):
                 {"index": 0, "X": 0.2}
             ]
         }
-        logger.info("=" * 50)
-        logger.info("=== Inizio test: X non diminuisce ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
-
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         old_x = data["events"][0]["X"]
         new_x = response.data["events"][0]["X"]
         self.assertGreaterEqual(new_x, old_x)
-
-        logger.info("Fine test")
 
     def test_x_non_supera_uno(self):
         data = {
@@ -144,18 +110,10 @@ class DatiMeteoV1ApiTest(APITestCase):
             ]
         }
 
-        logger.info("=" * 50)
-        logger.info("=== Inizio test: X non supera uno ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         self.assertLessEqual(response.data["events"][0]["X"], 1)
-        logger.info("Fine test")
 
     def test_nuovo_evento_viene_aggiunto(self):
         data = {
@@ -168,23 +126,13 @@ class DatiMeteoV1ApiTest(APITestCase):
                 {"index": 0, "X": 0.4}
             ]
         }
-        logger.info("=" * 50)
-        logger.info("=== Inizio test: nuovo evento viene aggiunto ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
-
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["events"]), 2)
         self.assertEqual(response.data["events"][1]["index"], 1)
         self.assertEqual(response.data["events"][1]["X"], 0.0)
-
-        logger.info("Fine test")
 
     def test_x_in_tutti_gli_eventi_aumenta(self):
         data = {
@@ -199,17 +147,8 @@ class DatiMeteoV1ApiTest(APITestCase):
                 {"index": 2, "X": 0.6}
             ]
         }
-        logger.info("=" * 50)
-        logger.info(
-            "=== Inizio test: X aumenta in tutti gli eventi ===")
-        logger.info("=" * 50)
-        logger.info("POST /dati-meteo/v1/")
-        logger.info("Request JSON: %s", data)
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
-
-        logger.info("Status: %s", response.status_code)
-        logger.info("Response JSON: %s", response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["events"]), 3)
@@ -225,8 +164,6 @@ class DatiMeteoV1ApiTest(APITestCase):
         self.assertEqual(response.data["events"][2]["index"], 2)
         self.assertGreaterEqual(response.data["events"][2]["X"], 0.6)
         self.assertLessEqual(response.data["events"][2]["X"], 1)
-
-        logger.info("Fine test")
 
 
 class DatiMeteoV2ApiTest(APITestCase):
