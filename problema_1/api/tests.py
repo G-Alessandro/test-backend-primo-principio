@@ -210,28 +210,30 @@ class DatiMeteoV2ApiTest(APITestCase):
             evento["X"] for evento in response.data[0]["events"] if evento["index"] == 1
         )
 
-        for giorno in response.data[1:]:
-            self.assertIn("events", giorno)
-            self.assertEqual(len(giorno["events"]), 2)
+        for i, giorno in enumerate(response.data):
+            self.assertEqual(giorno["doy"], data[i]["doy"])
+            if i > 1:
+                self.assertIn("events", giorno)
+                self.assertEqual(len(giorno["events"]), 2)
 
-            evento_index_uno = next(
-                evento for evento in giorno["events"] if evento["index"] == 1
-            )
-            evento_index_zero = next(
-                evento for evento in giorno["events"] if evento["index"] == 0
-            )
+                evento_index_uno = next(
+                    evento for evento in giorno["events"] if evento["index"] == 1
+                )
+                evento_index_zero = next(
+                    evento for evento in giorno["events"] if evento["index"] == 0
+                )
 
-            self.assertGreaterEqual(
-                evento_index_zero["X"],
-                x_precedente_index_zero
-            )
-            self.assertGreaterEqual(
-                evento_index_uno["X"],
-                x_precedente_index_uno
-            )
+                self.assertGreaterEqual(
+                    evento_index_zero["X"],
+                    x_precedente_index_zero
+                )
+                self.assertGreaterEqual(
+                    evento_index_uno["X"],
+                    x_precedente_index_uno
+                )
 
-            x_precedente_index_zero = evento_index_zero["X"]
-            x_precedente_index_uno = evento_index_uno["X"]
+                x_precedente_index_zero = evento_index_zero["X"]
+                x_precedente_index_uno = evento_index_uno["X"]
 
     # viene aggiunto un evento al primo e terzo giorno incrementandoli nei giorni successivi
     def test_aggiunta_evento_al_primo_e_terzo_giorno(self):
@@ -249,6 +251,7 @@ class DatiMeteoV2ApiTest(APITestCase):
 
         for i, giorno in enumerate(response.data):
             self.assertIn("events", giorno)
+            self.assertEqual(giorno["doy"], data[i]["doy"])
 
             if i < 2:
                 self.assertEqual(len(giorno["events"]), 1)
@@ -288,6 +291,7 @@ class DatiMeteoV2ApiTest(APITestCase):
         )
 
         for i, giorno in enumerate(response.data):
+            self.assertEqual(giorno["doy"], data[i]["doy"])
             self.assertIn("events", giorno)
 
             if i < 2:
