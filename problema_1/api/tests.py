@@ -202,13 +202,8 @@ class DatiMeteoV2ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v2/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        x_precedente_index_zero = next(
-            evento["X"] for evento in response.data[0]["events"] if evento["index"] == 0
-        )
-
-        x_precedente_index_uno = next(
-            evento["X"] for evento in response.data[0]["events"] if evento["index"] == 1
-        )
+        x_precedente_index_zero = response.data[0]["events"][0]["X"]
+        x_precedente_index_uno = response.data[0]["events"][1]["X"]
 
         for i, giorno in enumerate(response.data):
             self.assertEqual(giorno["doy"], data[i]["doy"])
@@ -216,12 +211,8 @@ class DatiMeteoV2ApiTest(APITestCase):
                 self.assertIn("events", giorno)
                 self.assertEqual(len(giorno["events"]), 2)
 
-                evento_index_uno = next(
-                    evento for evento in giorno["events"] if evento["index"] == 1
-                )
-                evento_index_zero = next(
-                    evento for evento in giorno["events"] if evento["index"] == 0
-                )
+                evento_index_zero = giorno["events"][0]
+                evento_index_uno =  giorno["events"][1]
 
                 self.assertGreaterEqual(
                     evento_index_zero["X"],
@@ -241,13 +232,8 @@ class DatiMeteoV2ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v2/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        x_precedente_index_zero = next(
-            evento["X"] for evento in response.data[0]["events"] if evento["index"] == 0
-        )
-
-        x_precedente_index_uno = next(
-            evento["X"] for evento in response.data[2]["events"] if evento["index"] == 1
-        )
+        x_precedente_index_zero = response.data[0]["events"][0]["X"]
+        x_precedente_index_uno = response.data[2]["events"][1]["X"]
 
         for i, giorno in enumerate(response.data):
             self.assertIn("events", giorno)
@@ -257,10 +243,7 @@ class DatiMeteoV2ApiTest(APITestCase):
                 self.assertEqual(len(giorno["events"]), 1)
             else:
                 self.assertEqual(len(giorno["events"]), 2)
-
-                evento_index_uno = next(
-                    evento for evento in giorno["events"] if evento["index"] == 1
-                )
+                evento_index_uno = giorno["events"][1]
 
                 self.assertGreaterEqual(
                     evento_index_uno["X"],
@@ -269,9 +252,7 @@ class DatiMeteoV2ApiTest(APITestCase):
 
                 x_precedente_index_uno = evento_index_uno["X"]
 
-            evento_index_zero = next(
-                evento for evento in giorno["events"] if evento["index"] == 0
-            )
+            evento_index_zero = giorno["events"][0]
 
             self.assertGreaterEqual(
                 evento_index_zero["X"],
@@ -286,9 +267,7 @@ class DatiMeteoV2ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v2/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        x_precedente_index_zero = next(
-            evento["X"] for evento in response.data[2]["events"] if evento["index"] == 0
-        )
+        x_precedente_index_zero = response.data[2]["events"][0]["X"]
 
         for i, giorno in enumerate(response.data):
             self.assertEqual(giorno["doy"], data[i]["doy"])
