@@ -54,16 +54,19 @@ class DatiMeteoV1ApiTest(APITestCase):
             "bagnatura": 1,
             "humidity": 97.25,
             "rain": 0.0
-
         }
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        self.assertIn("events", response.data)
         self.assertEqual(response.data["doy"], 126)
-        self.assertEqual(len(response.data["events"]), 1)
-        self.assertEqual(response.data["events"][0]["index"], 0)
-        self.assertEqual(response.data["events"][0]["X"], 0.0)
+
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 1)
+        evento = eventi[0]
+        self.assertEqual(evento["index"], 0)
+        self.assertEqual(evento["X"], 0.0)
 
     def test_nessun_evento_creato_quando_le_condizioni_sono_false(self):
         data = {
@@ -77,8 +80,12 @@ class DatiMeteoV1ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v1/", data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["events"], [])
 
+        self.assertIn("events", response.data)
+        self.assertEqual(response.data["doy"], 128)
+
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 0)
 
     def test_x_non_diminuisce(self):
         data = {
@@ -94,9 +101,18 @@ class DatiMeteoV1ApiTest(APITestCase):
 
         response = self.client.post("/dati-meteo/v1/", data, format="json")
 
-        old_x = data["events"][0]["X"]
-        new_x = response.data["events"][0]["X"]
-        self.assertGreaterEqual(new_x, old_x)
+        self.assertIn("events", response.data)
+        self.assertEqual(response.data["doy"], 127)
+
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 1)
+
+        evento = eventi[0]
+        self.assertEqual(evento["index"], 0)
+
+        x_precedente = data["events"][0]["X"]
+        x_incrementato = evento["X"]
+        self.assertGreaterEqual(x_incrementato, x_precedente)
 
     def test_x_non_supera_uno(self):
         data = {
@@ -106,14 +122,20 @@ class DatiMeteoV1ApiTest(APITestCase):
             "humidity": 32.0,
             "rain": 0.0,
             "events": [
-                {"index": 0, "X": 0.9}
+                {"index": 0, "X": 1.0}
             ]
         }
 
-
         response = self.client.post("/dati-meteo/v1/", data, format="json")
 
-        self.assertLessEqual(response.data["events"][0]["X"], 1)
+        self.assertIn("events", response.data)
+        self.assertEqual(response.data["doy"], 190)
+
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 1)
+        evento = eventi[0]
+        self.assertEqual(evento["index"], 0)
+        self.assertLessEqual(evento["X"], 1)
 
     def test_nuovo_evento_viene_aggiunto(self):
         data = {
@@ -130,9 +152,18 @@ class DatiMeteoV1ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v1/", data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["events"]), 2)
-        self.assertEqual(response.data["events"][1]["index"], 1)
-        self.assertEqual(response.data["events"][1]["X"], 0.0)
+
+        self.assertIn("events", response.data)
+        self.assertEqual(response.data["doy"], 129)
+
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 2)
+
+        evento_esistente, nuovo_evento = eventi
+        self.assertEqual(evento_esistente["index"], 0)
+        self.assertGreater(evento_esistente["X"], 0.4)
+        self.assertEqual(nuovo_evento["index"], 1)
+        self.assertEqual(nuovo_evento["X"], 0.0)
 
     def test_x_in_tutti_gli_eventi_aumenta(self):
         data = {
@@ -151,19 +182,17 @@ class DatiMeteoV1ApiTest(APITestCase):
         response = self.client.post("/dati-meteo/v1/", data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["events"]), 3)
 
-        self.assertEqual(response.data["events"][0]["index"], 0)
-        self.assertGreaterEqual(response.data["events"][0]["X"], 0.9)
-        self.assertLessEqual(response.data["events"][0]["X"], 1)
+        self.assertIn("events", response.data)
+        self.assertEqual(response.data["doy"], 128)
 
-        self.assertEqual(response.data["events"][1]["index"], 1)
-        self.assertGreaterEqual(response.data["events"][1]["X"], 0.3)
-        self.assertLessEqual(response.data["events"][1]["X"], 1)
+        eventi = response.data["events"]
+        self.assertEqual(len(eventi), 3)
 
-        self.assertEqual(response.data["events"][2]["index"], 2)
-        self.assertGreaterEqual(response.data["events"][2]["X"], 0.6)
-        self.assertLessEqual(response.data["events"][2]["X"], 1)
+        for i, evento in enumerate(eventi):
+            self.assertEqual(evento["index"], i)
+            self.assertGreater(evento["X"], data["events"][i]["X"])
+            print(evento["index"], i, evento["X"], data["events"][i]["X"])
 
 
 class DatiMeteoV2ApiTest(APITestCase):
