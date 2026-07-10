@@ -192,7 +192,6 @@ class DatiMeteoV1ApiTest(APITestCase):
         for i, evento in enumerate(eventi):
             self.assertEqual(evento["index"], i)
             self.assertGreater(evento["X"], data["events"][i]["X"])
-            print(evento["index"], i, evento["X"], data["events"][i]["X"])
 
 
 class DatiMeteoV2ApiTest(APITestCase):
