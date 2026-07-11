@@ -1,0 +1,25 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0px 140px;
+}
+
+.containerListe {
+  display: flex;
+}
+
+.messaggio {
+  z-index: 1;
+  top: 0;
+  left: 20%;
+  position: absolute;
+  margin: 1rem auto 2rem;
+  padding: 1rem 1.5rem;
+  background: #72727244;
+  border-radius: 12px;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

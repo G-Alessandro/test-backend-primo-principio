@@ -1,0 +1,79 @@
+.container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container > h3 {
+  margin-bottom: 10px;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.riga {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.campo p:last-child {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #222;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  justify-content: center;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.evento {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+
+.nessunEvento {
+  padding: 0.75rem;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  background: #fafafa;
+  border-radius: 8px;
+}
