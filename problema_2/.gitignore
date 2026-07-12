@@ -10,7 +10,7 @@ db.sqlite3
 *.log
 
 # Variabili d'ambiente
-.env
+#.env
 
 # IDE
 .vscode/
