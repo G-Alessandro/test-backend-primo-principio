@@ -256,7 +256,7 @@ docker exec problema-1 python manage.py test api.tests.DatiMeteoV1ApiTest.test_c
 
 ## Ispezione del database
 
-Per visualizzare i dati presenti nel database è necessario aprire almeno una volta il frontend ed eseguire una richiesta all'API `problema_2`, in modo da salvare gli eventi nel database.
+Per visualizzare i dati presenti nel database è necessario aprire almeno una volta il frontend, in modo che venga eseguita una richiesta all'API `problema_2` e gli eventi vengano salvati nel database.
 
 ### Accedere alla console PostgreSQL
 
