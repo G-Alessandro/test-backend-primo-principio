@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  problema-1:
+    build: ./problema_1
+    container_name: problema-1
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./problema_1/.env
+
+  problema-2:
+    build: ./problema_2
+    container_name: problema-2
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      problema-1:
+        condition: service_started
+    env_file:
+      - ./problema_2/.env
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application
+      "
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - problema-2
+    env_file:
+      - ./frontend/.env
+
+volumes:
+  postgres_data:
