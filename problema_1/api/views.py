@@ -63,26 +63,46 @@ def dati_meteo_v1(request):
 
 # Complessità Temporale: O(m)
 def crea_evento_v2(giorno, eventi_giorno, bagnatura, humidity, temperature, rain):
+    # Verifica se le condizioni meteorologiche permettono la creazione
+    # di un nuovo evento.
     condizioni_evento = ((bagnatura == 1 and rain > 0) or (
         bagnatura == 1 and humidity > 80 and temperature > 15))
+
+    # Se le condizioni meteorologiche sono soddisfatte,
+    # aggiunge un nuovo evento al giorno corrente.
     if condizioni_evento:
+
+        # Se la struttura del giorno contiene già degli eventi,
+        # recupera la relativa lista.
         if eventi_giorno:
             eventi = eventi_giorno["events"]
 
+            # Se sono già presenti eventi, assegna al nuovo evento
+            # un indice maggiore di uno rispetto all'indice più alto.
             if eventi:
                 ultimo_index = max(evento["index"] for evento in eventi)
                 nuovo_index = ultimo_index + 1
+
+            # Se la lista degli eventi è vuota,
+            # il primo evento riceve indice 0.
             else:
                 nuovo_index = 0
 
+            # Aggiunge il nuovo evento inizializzando X a 0.0
             eventi.append({
                 "index": nuovo_index,
                 "X": 0.0
             })
+
+        # Se non esiste ancora una struttura per il giorno corrente,
+        # la crea inserendo il primo evento con indice 0.
         else:
             eventi_giorno = {
                 "doy": giorno["doy"], "events": [{"index": 0, "X": 0.0}]}
 
+    # Se non si verificano le condizioni per creare un evento
+    # e non esiste ancora una struttura per il giorno corrente,
+    # crea il giorno con una lista di eventi vuota.
     elif not eventi_giorno:
         eventi_giorno = {"doy": giorno["doy"], "events": []}
 
@@ -94,7 +114,8 @@ def crea_evento_v2(giorno, eventi_giorno, bagnatura, humidity, temperature, rain
 def gestisci_eventi(dati, giorno_precedente, lista_eventi):
     inizio_controllo = 0
 
-    # salverà nella variabile eventi di dati_meteo_v2 il giorno precedente(ieri) se contiene "events"
+    # Se il giorno precedente contiene eventi, li aggiunge a lista_eventi
+    # e fa iniziare l'elaborazione dei dati dall'indice 1
     if "events" in giorno_precedente:
         inizio_controllo = 1
         lista_eventi.append({"doy": giorno_precedente["doy"],
@@ -106,14 +127,16 @@ def gestisci_eventi(dati, giorno_precedente, lista_eventi):
         eventi_giorno_successivo = {}
         ultimo_giorno = None
 
-        # salverà in ultimo_giorno l'ultimo giorno al'interno della variabile eventi di dati_meteo_v2
+        # Cerca, partendo dalla fine di lista_eventi,
+        # il giorno più recente che contiene almeno un evento
         if lista_eventi:
             for giorno_eventi in reversed(lista_eventi):
                 if giorno_eventi["events"]:
                     ultimo_giorno = giorno_eventi
                     break
 
-        # aggiorna X in tutti gli eventi della variabile ultimo_giorno per poi aggiungerli alla variabile eventi_giorno_successivo
+        # Aggiorna il valore X degli eventi più recenti
+        # e li associa al giorno attualmente elaborato
         if ultimo_giorno:
             ultimi_eventi_aggiornati = []
 
@@ -126,10 +149,23 @@ def gestisci_eventi(dati, giorno_precedente, lista_eventi):
             eventi_giorno_successivo = {
                 "doy": giorno["doy"], "events": ultimi_eventi_aggiornati}
 
-        # crea un nuovo evento se le condizioni lo permettono
-        eventi_giorno_successivo = crea_evento_v2(giorno, eventi_giorno_successivo,
-                                                  giorno["bagnatura"], giorno["humidity"], giorno["temperature"], giorno["rain"])
+        # Verifica le condizioni meteorologiche del giorno corrente.
+        # Se sono soddisfatte, aggiunge un nuovo evento alla lista
+        # degli eventi già propagati dai giorni precedenti.
+        #
+        # Se non ci sono eventi precedenti e le condizioni non sono
+        # soddisfatte, crea comunque la struttura del giorno
+        # con una lista di eventi vuota.
+        eventi_giorno_successivo = crea_evento_v2(
+            giorno,
+            eventi_giorno_successivo,
+            giorno["bagnatura"],
+            giorno["humidity"],
+            giorno["temperature"],
+            giorno["rain"]
+        )
 
+        # Salva nella lista il risultato relativo al giorno elaborato
         lista_eventi.append(eventi_giorno_successivo)
 
 
