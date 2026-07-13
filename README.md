@@ -10,6 +10,7 @@ Test backend per candidatura sviluppatore software presso Primo Principio
 - [Componenti del progetto](#componenti-del-progetto)
 - [API esterne al progetto usate](#api-esterne-al-progetto-usate)
 - [Requisiti](#requisiti)
+- [dipendenze](#dipendenze)
 - [Avvio del progetto con Docker Compose](#avvio-del-progetto-con-docker-compose)
 - [Avvio del progetto con Docker](#avvio-del-progetto-con-docker)
 - [Servizi disponibili](#servizi-disponibili)
@@ -52,6 +53,10 @@ Test backend per candidatura sviluppatore software presso Primo Principio
 
 - Docker Desktop oppure Docker Engine con Docker Compose.
 - Repository del progetto clonata in locale.
+
+## Dipendenze
+
+Tutte le dipendenze del progetto vengono installate automaticamente durante la build dell'immagine Docker.
 
 ## Avvio del progetto con Docker Compose
 
